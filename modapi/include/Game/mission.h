@@ -25,8 +25,8 @@ class Mission {
         static inline uintptr_t mission = 0;
     public:
         static void init(void);
-        static int getmissionid(void);
-        static void setmissionid(int value);
+        static int getid(void);
+        static void setid(int value);
         static int getcompletedsidemissions(void);
         static void setcompletedsidemission(int value);
 };

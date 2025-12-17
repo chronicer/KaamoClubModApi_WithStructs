@@ -25,11 +25,11 @@ class Station {
         static inline uintptr_t station = 0;
     public:
         static void init(void);
-        static std::string getstationname(void);
-        static void setstationname(const std::string value);
-        static int getstationtechlevel(void);
-        static void setstationtechlevel(int value);
-        static int getstationid(void);
-        static void setstationid(int value);
+        static int getid(void);
+        static void setid(int value);
+        static std::string getname(void);
+        static void setname(const std::string value);
+        static int gettechlevel(void);
+        static void settechlevel(int value);
 };
 #endif

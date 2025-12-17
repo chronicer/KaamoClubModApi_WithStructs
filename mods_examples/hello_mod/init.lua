@@ -1,12 +1,21 @@
 isingame = false
 assetchanged = false
 
+function get_every_assets_filepath()
+	local filepath
+	for i = 0x0,0x8000 do
+		filepath = asset:GetAssetFilePath(i)
+		if filepath ~= "" then print(filepath) end
+	end
+end
+
 RegisterEvent("IsInGame", function()
 	isingame = true
 end)
 
 RegisterEvent("IsInMainMenu", function()
 	if assetchanged then return end
+	--get_every_assets_filepath()
 	print("Asset changed!")
 	asset:SetAssetFilePath(0x2008, "mods/hello_mod/my_assets/custom_gof2_interface.aei") -- feel free to custom the gof2 interface with any tools (I don't know if we have any) also you can call this setassetfilepath function while the game is running BUT it won't be edited instantly, for the asset to be edited you need to 'reload' the game aka going to a station, changing system etc..
 	assetchanged = true

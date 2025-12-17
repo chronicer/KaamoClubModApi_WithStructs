@@ -52,26 +52,26 @@ void LuaManager::bind_api()
 
     lua_state.new_usertype<System>("System",
         sol::no_constructor,
-        "id", sol::property(&System::getsystemid, &System::setsystemid),
-        "risk", sol::property(&System::getsystemrisklevel, &System::setsystemrisklevel),
-        "faction", sol::property(&System::getsystemfaction, &System::setsystemfaction),
-        "jumpgatestationid", sol::property(&System::getsystemjumpgatestationid, &System::setsystemjumpgatestationid),
-        "mapcoordinate_x", sol::property(&System::getsystemmapcoordinatex, &System::setsystemmapcoordinatex),
-        "mapcoordinate_y", sol::property(&System::getsystemmapcoordinatey, &System::setsystemmapcoordinatey),
-        "mapcoordinate_z", sol::property(&System::getsystemmapcoordinatez, &System::setsystemmapcoordinatez)
+        "id", sol::property(&System::getid, &System::setid),
+        "risk", sol::property(&System::getrisklevel, &System::setrisklevel),
+        "faction", sol::property(&System::getfaction, &System::setfaction),
+        "jumpgatestationid", sol::property(&System::getjumpgatestationid, &System::setjumpgatestationid),
+        "mapcoordinate_x", sol::property(&System::getmapcoordinatex, &System::setmapcoordinatex),
+        "mapcoordinate_y", sol::property(&System::getmapcoordinatey, &System::setmapcoordinatey),
+        "mapcoordinate_z", sol::property(&System::getmapcoordinatez, &System::setmapcoordinatez)
     );
 
     lua_state.new_usertype<Mission>("Mission",
         sol::no_constructor,
-        "id", sol::property(&Mission::getmissionid, &Mission::setmissionid),
+        "id", sol::property(&Mission::getid, &Mission::setid),
         "completedsidemissions", sol::property(&Mission::getcompletedsidemissions, &Mission::setcompletedsidemission)
     );
 
     lua_state.new_usertype<Station>("Station",
         sol::no_constructor,
-        "id", sol::property(&Station::getstationid, &Station::setstationid),
-        "name", sol::property(&Station::getstationname, &Station::setstationname),
-        "level", sol::property(&Station::getstationtechlevel, &Station::setstationtechlevel)
+        "id", sol::property(&Station::getid, &Station::setid),
+        "name", sol::property(&Station::getname, &Station::setname),
+        "level", sol::property(&Station::gettechlevel, &Station::settechlevel)
     );
 
     lua_state.new_usertype<Asset>("Asset",

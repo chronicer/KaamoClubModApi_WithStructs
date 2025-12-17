@@ -34,20 +34,20 @@ void EventManager::ingame_event()
 {
     // <1000 because when the game init the pointer it has some random values so the in game event gets triggered
     // TODO: Do a better ingame event impl because if we go in game and then go back to the main menu the pointer still has the mission id value
-    if (Mission::getmissionid() > 0 && Mission::getmissionid() < 1000)
+    if (Mission::getid() > 0 && Mission::getid() < 1000)
         trigger("IsInGame");
 }
 
 void EventManager::mainmenu_event()
 {
-    if (Mission::getmissionid() == 0)
+    if (Mission::getid() == 0)
         trigger("IsInMainMenu");
 }
 
 void EventManager::systemchanged_event()
 {
-    static int old = System::getsystemid();
-    int current = System::getsystemid();
+    static int old = System::getid();
+    int current = System::getid();
 
     if (current != old) {
         trigger("OnSystemChanged", current);

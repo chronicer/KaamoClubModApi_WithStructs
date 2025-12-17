@@ -25,20 +25,20 @@ class System {
         static inline uintptr_t system = 0;
     public:
         static void init(void);
-        static int getsystemid(void);
-        static void setsystemid(int value);
-        static int getsystemrisklevel(void);
-        static void setsystemrisklevel(int value);
-        static int getsystemfaction(void);
-        static void setsystemfaction(int value);
-        static int getsystemjumpgatestationid(void);
-        static void setsystemjumpgatestationid(int value);
-        static int getsystemmapcoordinatex(void);
-        static void setsystemmapcoordinatex(int value);
-        static int getsystemmapcoordinatey(void);
-        static void setsystemmapcoordinatey(int value);
-        static int getsystemmapcoordinatez(void);
-        static void setsystemmapcoordinatez(int value);
+        static int getid(void);
+        static void setid(int value);
+        static int getrisklevel(void);
+        static void setrisklevel(int value);
+        static int getfaction(void);
+        static void setfaction(int value);
+        static int getjumpgatestationid(void);
+        static void setjumpgatestationid(int value);
+        static int getmapcoordinatex(void);
+        static void setmapcoordinatex(int value);
+        static int getmapcoordinatey(void);
+        static void setmapcoordinatey(int value);
+        static int getmapcoordinatez(void);
+        static void setmapcoordinatez(int value);
 };
 
 #endif

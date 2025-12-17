@@ -23,85 +23,85 @@ void System::init()
     system = MemoryUtils::GetModuleBase("GoF2.exe") + 0x20AD6C;
 }
 
-int System::getsystemid()
+int System::getid()
 {
     uintptr_t finaladdr = MemoryUtils::GetPointerAddress(system, {0x168, 0x14});
     return MemoryUtils::Read<int>(finaladdr);
 }
 
-void System::setsystemid(int value)
+void System::setid(int value)
 {
     uintptr_t finaladdr = MemoryUtils::GetPointerAddress(system, {0x168, 0x14});
     MemoryUtils::Write<int>(finaladdr, value);
 }
 
-int System::getsystemrisklevel()
+int System::getrisklevel()
 {
     uintptr_t finaladdr = MemoryUtils::GetPointerAddress(system, {0x168, 0x18});
     return MemoryUtils::Read<int>(finaladdr);
 }
 
-void System::setsystemrisklevel(int value)
+void System::setrisklevel(int value)
 {
     uintptr_t finaladdr = MemoryUtils::GetPointerAddress(system, {0x168, 0x18});
     MemoryUtils::Write<int>(finaladdr, value);
 }
 
-int System::getsystemfaction(void)
+int System::getfaction(void)
 {
     uintptr_t finaladdr = MemoryUtils::GetPointerAddress(system, {0x168, 0x1C});
     return MemoryUtils::Read<int>(finaladdr);
 }
 
-void System::setsystemfaction(int value)
+void System::setfaction(int value)
 {
     uintptr_t finaladdr = MemoryUtils::GetPointerAddress(system, {0x168, 0x1C});
     MemoryUtils::Write<int>(finaladdr, value);
 }
 
-int System::getsystemjumpgatestationid(void)
+int System::getjumpgatestationid(void)
 {
     uintptr_t finaladdr = MemoryUtils::GetPointerAddress(system, {0x168, 0x2C});
     return MemoryUtils::Read<int>(finaladdr);
 }
 
-void System::setsystemjumpgatestationid(int value)
+void System::setjumpgatestationid(int value)
 {
     uintptr_t finaladdr = MemoryUtils::GetPointerAddress(system, {0x168, 0x2C});
     MemoryUtils::Write<int>(finaladdr, value);
 }
 
-int System::getsystemmapcoordinatex(void)
+int System::getmapcoordinatex(void)
 {
     uintptr_t finaladdr = MemoryUtils::GetPointerAddress(system, {0x168, 0x20});
     return MemoryUtils::Read<int>(finaladdr);
 }
 
-void System::setsystemmapcoordinatex(int value)
+void System::setmapcoordinatex(int value)
 {
     uintptr_t finaladdr = MemoryUtils::GetPointerAddress(system, {0x168, 0x20});
     MemoryUtils::Write<int>(finaladdr, value);
 }
 
-int System::getsystemmapcoordinatey(void)
+int System::getmapcoordinatey(void)
 {
     uintptr_t finaladdr = MemoryUtils::GetPointerAddress(system, {0x168, 0x24});
     return MemoryUtils::Read<int>(finaladdr);
 }
 
-void System::setsystemmapcoordinatey(int value)
+void System::setmapcoordinatey(int value)
 {
     uintptr_t finaladdr = MemoryUtils::GetPointerAddress(system, {0x168, 0x24});
     MemoryUtils::Write<int>(finaladdr, value);
 }
 
-int System::getsystemmapcoordinatez(void)
+int System::getmapcoordinatez(void)
 {
     uintptr_t finaladdr = MemoryUtils::GetPointerAddress(system, {0x168, 0x28});
     return MemoryUtils::Read<int>(finaladdr);
 }
 
-void System::setsystemmapcoordinatez(int value)
+void System::setmapcoordinatez(int value)
 {
     uintptr_t finaladdr = MemoryUtils::GetPointerAddress(system, {0x168, 0x28});
     MemoryUtils::Write<int>(finaladdr, value);
