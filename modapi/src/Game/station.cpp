@@ -58,3 +58,10 @@ void Station::settechlevel(int value)
     uintptr_t finaladdr = MemoryUtils::GetPointerAddress(station, {0x160, 0x1C});
     MemoryUtils::Write<int>(finaladdr, value);
 }
+
+bool Station::isvoid(void)
+{
+    if (getid() == -1)
+        return true;
+    return false;
+}

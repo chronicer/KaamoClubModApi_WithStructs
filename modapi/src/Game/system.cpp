@@ -106,3 +106,19 @@ void System::setmapcoordinatez(int value)
     uintptr_t finaladdr = MemoryUtils::GetPointerAddress(system, {0x168, 0x28});
     MemoryUtils::Write<int>(finaladdr, value);
 }
+
+std::string System::getname()
+{
+    uintptr_t finaladdr = MemoryUtils::GetPointerAddress(system, {0x168, 0xC});
+    uintptr_t strptr = MemoryUtils::Read<uintptr_t>(finaladdr);
+
+    return MemoryUtils::ReadWideString(strptr);
+}
+
+void System::setname(std::string value)
+{
+    uintptr_t finaladdr = MemoryUtils::GetPointerAddress(system, {0x168, 0xC});
+    uintptr_t strptr = MemoryUtils::Read<uintptr_t>(finaladdr);
+
+    MemoryUtils::WriteWideString(strptr, value);
+}

@@ -39,6 +39,8 @@ class System {
         static void setmapcoordinatey(int value);
         static int getmapcoordinatez(void);
         static void setmapcoordinatez(int value);
+        static std::string getname(void);
+        static void setname(std::string value);
 };
 
 #endif

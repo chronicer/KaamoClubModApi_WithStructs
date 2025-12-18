@@ -44,6 +44,17 @@ void EventManager::mainmenu_event()
         trigger("IsInMainMenu");
 }
 
+void EventManager::stationchanged_event()
+{
+    static int old = Station::getid();
+    int current = Station::getid();
+
+    if (current != old) {
+        trigger("OnStationChanged", current);
+        old = current;
+    }
+}
+
 void EventManager::systemchanged_event()
 {
     static int old = System::getid();
@@ -78,4 +89,5 @@ void EventManager::trigger_events()
     moneychanged_event();
     mainmenu_event();
     ingame_event();
+    stationchanged_event();
 }

@@ -13,6 +13,15 @@ RegisterEvent("IsInGame", function()
 	isingame = true
 end)
 
+RegisterEvent("OnStationChanged", function(id)
+	if not isingame then return end
+	if station:IsVoid() then
+		print("wow you joined the voids!!!")
+		return
+	end
+	print("New station ! : " .. id)
+end)
+
 RegisterEvent("IsInMainMenu", function()
 	if assetchanged then return end
 	--get_every_assets_filepath()
@@ -29,6 +38,7 @@ end)
 RegisterEvent("OnSystemChanged", function(id)
 	if not isingame then return end
 	print("System id : " .. id)
+	print("System name : " .. system.name)
 	print("System risk : " .. system.risk)
 	print("System faction : " .. system.faction)
 	print("System map coordinate x : " .. system.mapcoordinate_x)

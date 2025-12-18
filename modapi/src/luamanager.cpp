@@ -24,11 +24,8 @@ void LuaManager::init()
 }
 
 void LuaManager::bind_api()
-{
-
-    //lua_state.set_function("HelloWorld", &HelloWorld);
-    
-    // TODO: do a better wait because if a script uses wait() then every scripts waits...
+{    
+    // TODO: do a better wait (aka a scheduler) because if a script uses wait() then every scripts waits...
     lua_state.set_function("wait", [](int seconds) { 
         Sleep(seconds * 1000); 
     });
@@ -53,6 +50,7 @@ void LuaManager::bind_api()
     lua_state.new_usertype<System>("System",
         sol::no_constructor,
         "id", sol::property(&System::getid, &System::setid),
+        "name", sol::property(&System::getname, &System::setname),
         "risk", sol::property(&System::getrisklevel, &System::setrisklevel),
         "faction", sol::property(&System::getfaction, &System::setfaction),
         "jumpgatestationid", sol::property(&System::getjumpgatestationid, &System::setjumpgatestationid),
@@ -71,7 +69,10 @@ void LuaManager::bind_api()
         sol::no_constructor,
         "id", sol::property(&Station::getid, &Station::setid),
         "name", sol::property(&Station::getname, &Station::setname),
-        "level", sol::property(&Station::gettechlevel, &Station::settechlevel)
+        "level", sol::property(&Station::gettechlevel, &Station::settechlevel),
+        "IsVoid", [](Station& self) -> bool {
+            return Station::isvoid();
+        }
     );
 
     lua_state.new_usertype<Asset>("Asset",

@@ -31,5 +31,7 @@ class Station {
         static void setname(const std::string value);
         static int gettechlevel(void);
         static void settechlevel(int value);
+        
+        static bool isvoid(void);
 };
 #endif
