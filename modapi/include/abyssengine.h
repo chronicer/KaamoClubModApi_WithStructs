@@ -5,22 +5,53 @@
 
 class AbyssEngine {
     public:
+        typedef uintptr_t(__cdecl* malloc_t)(size_t size);
+        static uintptr_t memory_allocate(size_t size)
+        {
+            static uintptr_t ptr = 0x0052D150;
+            malloc_t pmalloc = *reinterpret_cast<malloc_t*>(ptr);
+            uintptr_t result = 0;
+
+            if (!pmalloc) {
+                return 0;
+            }
+
+            // SEH
+            __try {
+                result = pmalloc(size);
+            } __except (EXCEPTION_EXECUTE_HANDLER) {
+                std::cout << "wtf" << std::endl;
+                result = 0;
+            }
+            return result;
+        }
         static AEString newstring(const wchar_t* str)
         {
-            AEString r{};
+            AEString r = { 0 };
+
+            if (!str)
+                return r;
             r.size = (uint32_t)(wcslen(str) + 1);
-            r.text = (wchar_t*)VirtualAlloc(nullptr, sizeof(wchar_t) * r.size, MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE);
-            wcscpy_s(r.text, r.size, str);
+            r.text = (wchar_t*)memory_allocate(sizeof(wchar_t) * r.size);
+            if (r.text != nullptr) {
+                wcscpy_s(r.text, r.size, str);
+            } else {
+                r.size = 0;
+            }
             return r;
         }
-
         template<typename T>
         static AEArray<T>* newarray(uint32_t n)
         {
-            auto* a = (AEArray<T>*)VirtualAlloc(nullptr, sizeof(AEArray<T>), MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE);
-            a->size = a->size2 = n;
-            a->data = (T*)VirtualAlloc(nullptr, sizeof(T) * n, MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE);
-            memset(a->data, 0, sizeof(T) * n);
+            auto* a = (AEArray<T>*)memory_allocate(sizeof(AEArray<T>));
+            
+            if (!a)
+                return nullptr;
+            a->size = n;
+            a->size2 = n;
+            a->data = (T*)memory_allocate(sizeof(T) * n);
+            if (a->data)
+                memset(a->data, 0, sizeof(T) * n);
             return a;
         }
 };

@@ -34,11 +34,10 @@ void Hooks::injectsystems()
     const uint32_t add_sys_count = (uint32_t)System::created_systems.size();
     const uint32_t new_sys_count = sys_count + add_sys_count;
 
-    auto* new_sys_array = (AEArray<SingleSystem*>*)VirtualAlloc(nullptr, sizeof(AEArray<SingleSystem*>),MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE);
+    auto* new_sys_array = reinterpret_cast<AEArray<SingleSystem*>*>(AbyssEngine::memory_allocate(sizeof(AEArray<SingleSystem*>)));
 
     new_sys_array->size = new_sys_array->size2 = new_sys_count;
-    new_sys_array->data = (SingleSystem**)VirtualAlloc(nullptr, sizeof(SingleSystem*) * new_sys_count, MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE);
-
+    new_sys_array->data = reinterpret_cast<SingleSystem**>(AbyssEngine::memory_allocate(sizeof(SingleSystem*) * new_sys_count));
     memcpy(new_sys_array->data, systems->data,sizeof(SingleSystem*) * sys_count);
 
     for (size_t i = 0; i < System::created_systems.size(); ++i) {
@@ -56,10 +55,11 @@ void Hooks::injectsystems()
         copy.linked_system_ids = AbyssEngine::newarray<uint32_t>(1);
         copy.linked_system_ids->data[0] = id;
 
-        copy.station_ids = AbyssEngine::newarray<uint32_t>(1);
+        copy.station_ids = AbyssEngine::newarray<uint32_t>(2);
         copy.station_ids->data[0] = 109;
+        copy.station_ids->data[1] = 110;
 
-        auto* newsysdata = (SingleSystem*)VirtualAlloc(nullptr, sizeof(SingleSystem), MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE);
+        auto* newsysdata = reinterpret_cast<SingleSystem*>(AbyssEngine::memory_allocate(sizeof(SingleSystem)));
 
         memcpy(newsysdata, &copy, sizeof(SingleSystem));
         new_sys_array->data[sys_count + i] = newsysdata;
@@ -106,28 +106,35 @@ uintptr_t __stdcall Hooks::fileread_loadstationbinaryfromid_hook(const uint16_t*
 
 uintptr_t __stdcall Hooks::fileread_loadstationbinary_hook(SingleSystem* system)
 {
+    // POC NEW STATION | GOING TO THE STATION CRASH ATM DUE TO OF loadstationbinaryfromid_hook BEING EMPTY
     AEArray<SingleStation*>* old_array = reinterpret_cast<AEArray<SingleStation*>*>(old_filereadloadstationbinary(system));
 
-    //if (system->id != 27)
-    //    return reinterpret_cast<uintptr_t>(old_array);
-    SingleStation* first_station = old_array->data[0];
-    if (first_station->id == 109) {
-        //AEArray<SingleStation*>* new_sts_array = (AEArray<SingleStation*>*)VirtualAlloc(nullptr, sizeof(AEArray<SingleStation*>),MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE);
-        //memcpy(new_sts_array, old_array, sizeof(AEArray<SingleStation*>));
-        //new_sts_array->size = 1;
-        //new_sts_array->size2 = 1;
-        //new_sts_array->data = (SingleStation**)VirtualAlloc(nullptr, sizeof(SingleStation*) * 1, MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE);
-        //memcpy(new_sts_array->data, old_array->data, sizeof(SingleStation*));
-        //SingleStation* newstsdata = (SingleStation*)VirtualAlloc(nullptr, sizeof(SingleStation), MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE);
-        //memcpy(newstsdata, old_array->data[0], sizeof(SingleStation));
-        //old_array->data[0] = newstsdata;
-        //std::cout << old_array->data[0]->id << std::endl;
-        //new_sts_array->data[0] = newstsdata;
-        //std::cout << "[*] new_sts_array ptr : " << new_sts_array << std::endl;
-        std::cout << "[*] old_array ptr : " << old_array << std::endl;
-        std::cout << "[*] System id: " << system->id << std::endl;
-        //return reinterpret_cast<uintptr_t>(new_sts_array);
+    SingleStation* stat = old_array->data[0];
+
+    if (stat->id == 109) {
+        AEArray<SingleStation*>* new_array = reinterpret_cast<AEArray<SingleStation*>*>(AbyssEngine::memory_allocate(sizeof(AEArray<SingleStation*>)));
+        new_array->data = reinterpret_cast<SingleStation**>(AbyssEngine::memory_allocate(sizeof(SingleStation*) * 2));
+
+        SingleStation* newstat1 = reinterpret_cast<SingleStation*>(AbyssEngine::memory_allocate(sizeof(SingleStation)));
+        memcpy(newstat1, stat, sizeof(SingleStation));
+        newstat1->name = AbyssEngine::newstring(L"game malloc lol");
+
+        SingleStation* newstat2 = reinterpret_cast<SingleStation*>(AbyssEngine::memory_allocate(sizeof(SingleStation)));
+        memcpy(newstat2, stat, sizeof(SingleStation));
+        newstat2->id = 110; 
+        newstat2->name = AbyssEngine::newstring(L"fuck virtualalloc");
+
+        if (new_array->data) {
+            new_array->data[0] = newstat1;
+            new_array->data[1] = newstat2;
+        }
+
+        new_array->size = 2;
+        new_array->size2 = 2; 
+        std::cout << "new_arr ptr " << new_array << std::endl;
+        return reinterpret_cast<uintptr_t>(new_array);
     }
+
     return reinterpret_cast<uintptr_t>(old_array);
 }
 
