@@ -2,150 +2,144 @@
 #include "abyssengine.h"
 #include "hooks.h"
 #include <Game/system.h>
+#include <iostream>
+#include <vector>
 
 Hooks::globals_init Hooks::oldglobals_init = nullptr;
 Hooks::fileread_loadstationbinaryfromid Hooks::old_filereadloadstationbinaryfromid = nullptr;
 Hooks::fileread_loadstationbinary Hooks::old_filereadloadstationbinary = nullptr;
 
-void Hooks::injectsystems()
+void Hooks::injectsystemsandstations()
 {
     auto* galaxy = *(Galaxy**)GLOBALS_GALAXY;
-
-    if (!galaxy || !galaxy->systems) {
-        std::cout << "[-] Failed to get Globals::Galaxy" << std::endl;
+    if (!galaxy || !galaxy->systems || System::created_systems.empty())
         return;
-    }
-
-    if (System::created_systems.empty())
-        return;
-
     auto* systems = galaxy->systems;
-    SingleSystem* wolf = nullptr;
-
-    for (uint32_t i = 0; i < systems->size; ++i) {
-        auto* s = systems->data[i];
-        if (s && s->name.text && wcscmp(s->name.text, L"Wolf-Reiser") == 0) {
-            wolf = s;
-            break;
-        }
-    }
-
     const uint32_t sys_count = systems->size;
     const uint32_t add_sys_count = (uint32_t)System::created_systems.size();
     const uint32_t new_sys_count = sys_count + add_sys_count;
-
     auto* new_sys_array = reinterpret_cast<AEArray<SingleSystem*>*>(AbyssEngine::memory_allocate(sizeof(AEArray<SingleSystem*>)));
-
+    
     new_sys_array->size = new_sys_array->size2 = new_sys_count;
     new_sys_array->data = reinterpret_cast<SingleSystem**>(AbyssEngine::memory_allocate(sizeof(SingleSystem*) * new_sys_count));
-    memcpy(new_sys_array->data, systems->data,sizeof(SingleSystem*) * sys_count);
-
+    memcpy(new_sys_array->data, systems->data, sizeof(SingleSystem*) * sys_count);
     for (size_t i = 0; i < System::created_systems.size(); ++i) {
-        const uint32_t id = sys_count + (uint32_t)i;
+        const uint32_t sysid = sys_count + (uint32_t)i;
+        const SingleSystem& src = System::created_systems[i];
 
-        SingleSystem copy = *wolf;
-        const SingleSystem& newsys = System::created_systems[i];
-
-        copy.id = id;
-        copy.pos = newsys.pos;
-        copy.name = newsys.name;
-        copy.jumpgate_station_id = newsys.jumpgate_station_id;
-        copy.starts_unlocked = true;
-
-        copy.linked_system_ids = AbyssEngine::newarray<uint32_t>(1);
-        copy.linked_system_ids->data[0] = id;
-
-        copy.station_ids = AbyssEngine::newarray<uint32_t>(2);
-        copy.station_ids->data[0] = 109;
-        copy.station_ids->data[1] = 110;
-
-        auto* newsysdata = reinterpret_cast<SingleSystem*>(AbyssEngine::memory_allocate(sizeof(SingleSystem)));
-
-        memcpy(newsysdata, &copy, sizeof(SingleSystem));
-        new_sys_array->data[sys_count + i] = newsysdata;
+        for (auto& st : Station::created_stations) {
+            if (st.systemid == src.id)
+                st.systemid = sysid;
+        }
+        auto* newsys = reinterpret_cast<SingleSystem*>(AbyssEngine::memory_allocate(sizeof(SingleSystem)));
+        memset(newsys, 0, sizeof(SingleSystem));
+        newsys->id = sysid;
+        newsys->name = AbyssEngine::newstring(src.name.text); 
+        newsys->pos = src.pos;
+        newsys->risk = src.risk;
+        newsys->faction = src.faction;
+        newsys->texture_id = src.texture_id;
+        newsys->starts_unlocked = true;
+        std::vector<uint32_t> matching_ids;
+        for (const auto& st : Station::created_stations) {
+            if (st.systemid == sysid)
+                matching_ids.push_back(st.id);
+        }
+        if (!matching_ids.empty()) {
+            newsys->station_ids = AbyssEngine::newarray<uint32_t>((int)matching_ids.size());
+            for (size_t j = 0; j < matching_ids.size(); ++j)
+                newsys->station_ids->data[j] = matching_ids[j];
+            //newsys->jumpgate_station_id = matching_ids[0];
+        }
+        //newsys->linked_system_ids = AbyssEngine::newarray<uint32_t>(2);
+        //newsys->linked_system_ids->data[0] = sysid; 
+        //newsys->linked_system_ids->data[1] = 20;
+        new_sys_array->data[sys_count + i] = newsys;
     }
-
     galaxy->systems = new_sys_array;
-
-    Patches::patchstarmap((uint8_t)new_sys_count);
-    Patches::patchloadstations(110); // loaded manually into stations.bin atm
-
+    Patches::patchstarmap((uint8_t)new_sys_count); // displaying systems on the star map
+    //Patches::patchloadstations(110);
     System::created_systems.clear();
+}
+
+uintptr_t __stdcall Hooks::fileread_loadstationbinary_hook(SingleSystem* system)
+{
+    AEArray<SingleStation*>* old_array = reinterpret_cast<AEArray<SingleStation*>*>(old_filereadloadstationbinary(system));
+
+    if (system) {
+        std::vector<const SingleStation*> matchlist;
+
+        for (const auto& st : Station::created_stations) {
+            if (st.systemid == system->id) {
+                matchlist.push_back(&st);
+            }
+        }
+        if (!matchlist.empty()) {
+            int count = (int)matchlist.size();
+            auto* new_array = reinterpret_cast<AEArray<SingleStation*>*>(AbyssEngine::memory_allocate(sizeof(AEArray<SingleStation*>)));
+            if (new_array) {
+                new_array->data = reinterpret_cast<SingleStation**>(AbyssEngine::memory_allocate(sizeof(SingleStation*) * count));
+                new_array->size = count; 
+                new_array->size2 = count;
+
+                for (size_t i = 0; i < matchlist.size(); ++i) {
+                    auto* cloned = reinterpret_cast<SingleStation*>(AbyssEngine::memory_allocate(sizeof(SingleStation)));
+                    if (cloned) {
+                        memcpy(cloned, matchlist[i], sizeof(SingleStation));
+                        cloned->name = AbyssEngine::newstring(matchlist[i]->name.text);
+                    }
+                    new_array->data[i] = cloned;
+                }
+                return reinterpret_cast<uintptr_t>(new_array);
+            }
+        }
+    }
+    return reinterpret_cast<uintptr_t>(old_array);
+}
+
+uintptr_t __stdcall Hooks::fileread_loadstationbinaryfromid_hook(const uint16_t* id)
+{
+    if (!id)
+        return old_filereadloadstationbinaryfromid(id);
+    uint32_t requested_id = (uint32_t)*id;
+
+    for (const auto& st : Station::created_stations) {
+        if (st.id == requested_id) {
+            auto* new_array = reinterpret_cast<AEArray<SingleStation*>*>(AbyssEngine::memory_allocate(sizeof(AEArray<SingleStation*>)));
+            if (new_array) {
+                new_array->data = reinterpret_cast<SingleStation**>(AbyssEngine::memory_allocate(sizeof(SingleStation*) * 1));
+                new_array->size = 1; 
+                new_array->size2 = 1;
+                auto* cloned = reinterpret_cast<SingleStation*>(AbyssEngine::memory_allocate(sizeof(SingleStation)));
+                memcpy(cloned, &st, sizeof(SingleStation));
+                new_array->data[0] = cloned;
+                return reinterpret_cast<uintptr_t>(new_array);
+            }
+        }
+    }
+    return old_filereadloadstationbinaryfromid(id);
 }
 
 uintptr_t __stdcall Hooks::globals_init_hook(uintptr_t a, uintptr_t b, uintptr_t c)
 {
     auto old = oldglobals_init(a, b, c);
     static bool called_once = false;
+
     if (!called_once) {
         called_once = true;
         CreateThread(nullptr, 0, [](LPVOID)->DWORD {
-            std::cout << "[+] Globals::init hooked successfully" << std::endl;
-            Hooks::injectsystems();
+            Hooks::injectsystemsandstations();
             return 0;
         }, nullptr, 0, nullptr);
     }
     return old;
 }
 
-uintptr_t __stdcall Hooks::fileread_loadstationbinaryfromid_hook(const uint16_t* a)
-{
-    //uint16_t newval = 108;
-    //auto old = old_filereadloadstationbinaryfromid(&newval);
-    auto old = old_filereadloadstationbinaryfromid(a);
-    //std::cout << "called" << std::endl;
-    //std::cout << *a << std::endl;
-    if (a && *a > 108) {
-        std::cout << "[*] Should teleport to our custom station" << std::endl;
-        // TODO: return the array of our custom station with the specific id
-    }
-    //std::cout << "[*] FileRead::loadStationBinaryFromId ptr = " << a << std::endl;
-    //std::cout << "[*] FileRead::loadStationBinaryFromId id = " << *a << std::endl;
-    return old;
-}
-
-uintptr_t __stdcall Hooks::fileread_loadstationbinary_hook(SingleSystem* system)
-{
-    // POC NEW STATION | GOING TO THE STATION CRASH ATM DUE TO OF loadstationbinaryfromid_hook BEING EMPTY
-    AEArray<SingleStation*>* old_array = reinterpret_cast<AEArray<SingleStation*>*>(old_filereadloadstationbinary(system));
-
-    SingleStation* stat = old_array->data[0];
-
-    if (stat->id == 109) {
-        AEArray<SingleStation*>* new_array = reinterpret_cast<AEArray<SingleStation*>*>(AbyssEngine::memory_allocate(sizeof(AEArray<SingleStation*>)));
-        new_array->data = reinterpret_cast<SingleStation**>(AbyssEngine::memory_allocate(sizeof(SingleStation*) * 2));
-
-        SingleStation* newstat1 = reinterpret_cast<SingleStation*>(AbyssEngine::memory_allocate(sizeof(SingleStation)));
-        memcpy(newstat1, stat, sizeof(SingleStation));
-        newstat1->name = AbyssEngine::newstring(L"game malloc lol");
-
-        SingleStation* newstat2 = reinterpret_cast<SingleStation*>(AbyssEngine::memory_allocate(sizeof(SingleStation)));
-        memcpy(newstat2, stat, sizeof(SingleStation));
-        newstat2->id = 110; 
-        newstat2->name = AbyssEngine::newstring(L"fuck virtualalloc");
-
-        if (new_array->data) {
-            new_array->data[0] = newstat1;
-            new_array->data[1] = newstat2;
-        }
-
-        new_array->size = 2;
-        new_array->size2 = 2; 
-        std::cout << "new_arr ptr " << new_array << std::endl;
-        return reinterpret_cast<uintptr_t>(new_array);
-    }
-
-    return reinterpret_cast<uintptr_t>(old_array);
-}
-
 void Hooks::init()
 {
-    std::cout << "[*] Starting hooks..." << std::endl;
     MH_Initialize();
     MH_CreateHook((LPVOID)GLOBALS_INIT_ADDR, &globals_init_hook, (LPVOID*)&oldglobals_init);
     MH_CreateHook((LPVOID)FILEREAD_LOADSTATIONBINARYFROMID, &fileread_loadstationbinaryfromid_hook, (LPVOID*)&old_filereadloadstationbinaryfromid);
     MH_CreateHook((LPVOID)FILEREAD_LOADSTATIONBIRARY, &fileread_loadstationbinary_hook, (LPVOID*)&old_filereadloadstationbinary);
-    MH_EnableHook((LPVOID)GLOBALS_INIT_ADDR);
-    MH_EnableHook((LPVOID)FILEREAD_LOADSTATIONBINARYFROMID);
-    MH_EnableHook((LPVOID)FILEREAD_LOADSTATIONBIRARY);
+    MH_EnableHook(MH_ALL_HOOKS);
 }

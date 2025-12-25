@@ -62,8 +62,8 @@ void LuaManager::bind_api()
         "mapcoordinate_x", sol::property(&System::getmapcoordinatex, &System::setmapcoordinatex),
         "mapcoordinate_y", sol::property(&System::getmapcoordinatey, &System::setmapcoordinatey),
         "mapcoordinate_z", sol::property(&System::getmapcoordinatez, &System::setmapcoordinatez),
-        "Create", [](System& self, const std::string& str, int x, int y, int z) {
-            System::create(str, x, y, z);
+        "Create", [](System& self, const std::string& str, int x, int y, int z, int faction, int risk, int textureid) {
+            return System::create(str, x, y, z, faction, risk, textureid);
         }
     );
 
@@ -85,6 +85,9 @@ void LuaManager::bind_api()
         },
         "SetAngarShipId", [](Station& self, int id, int value) {
             Station::setangarshipid(id, value);
+        },
+        "Create", [](Station& self, const std::string& str, int techlevel, int textureid, int systemid) {
+            return Station::create(str, techlevel, textureid, systemid);
         }
     );
 

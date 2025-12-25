@@ -13,15 +13,15 @@ class Hooks {
         static globals_init oldglobals_init;
         static uintptr_t __stdcall globals_init_hook(uintptr_t a, uintptr_t b, uintptr_t c);
         
-        using fileread_loadstationbinaryfromid = uintptr_t (__stdcall*)(const uint16_t*);
+        using fileread_loadstationbinaryfromid = uintptr_t (__stdcall*)(const uint16_t* id);
         static fileread_loadstationbinaryfromid old_filereadloadstationbinaryfromid;
-        static uintptr_t __stdcall fileread_loadstationbinaryfromid_hook(const uint16_t* a);
+        static uintptr_t __stdcall fileread_loadstationbinaryfromid_hook(const uint16_t* id);
 
         using fileread_loadstationbinary = uintptr_t (__stdcall*)(SingleSystem *system);
         static fileread_loadstationbinary old_filereadloadstationbinary;
         static uintptr_t __stdcall fileread_loadstationbinary_hook(SingleSystem *system);
 
-        static void injectsystems(void);
+        static void injectsystemsandstations(void);
     public:
         static void init(void);
 };

@@ -24,7 +24,8 @@ class System {
         static void setmapcoordinatez(int value);
         static std::string getname(void);
         static void setname(std::string value);
-        static void create(const std::string& str, int x, int y, int z);
+
+        static int create(const std::string& str, int x, int y, int z, int faction, int risk, int textureid);
 };
 
 #endif

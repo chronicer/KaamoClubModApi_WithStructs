@@ -111,11 +111,11 @@ void System::setname(std::string value)
     MemoryUtils::WriteWideString(strptr, value);
 }
 
-void System::create(const std::string& str, int x, int y, int z)
+int System::create(const std::string& str, int x, int y, int z, int faction, int risk, int textureid)
 {
     if (EventManager::isearlyinit_finished) {
         std::cout << "[-] Failed to call system:Create(), you can only call it in the EarlyInit event" << std::endl;
-        return;
+        return -1;
     }
 
     SingleSystem s;
@@ -132,6 +132,10 @@ void System::create(const std::string& str, int x, int y, int z)
     s.starts_unlocked = true;
     s.linked_system_ids = nullptr;
     s.station_ids = nullptr;
+    s.faction = faction;
+    s.risk = risk;
+    s.texture_id = textureid;
 
     created_systems.push_back(s);
+    return 26 + created_systems.size();
 }

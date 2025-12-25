@@ -32,6 +32,8 @@ void Patches::patchstarmap(uint8_t new_limit)
     VirtualProtect((LPVOID)0x004CE771, 2, old, &old);
 }
 
+// This patch is no longer used, it was useful to add a new station into stations.bin but now we are making stations in the runtime
+// I didn't delete it just incase it's useful for anyone
 void Patches::patchloadstations(uint8_t new_limit)
 {
     DWORD old;
