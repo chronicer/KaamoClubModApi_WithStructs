@@ -91,6 +91,9 @@ RegisterEvent("OnSystemChanged", function(id)
 	if player:IsDocked() then
 		print("player is docked in a station")
 	end
+	if not system:IsVisible(26) then
+		print("Shima system is not visible")
+	end
 	print("GOF2 Interface AEI : " .. asset:GetAssetFilePath(0x2008)) -- 0x2008 is the offset of the interface
 end)
 

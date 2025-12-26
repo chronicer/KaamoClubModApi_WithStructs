@@ -4,7 +4,7 @@
 
 class System {
     private:
-        static inline uintptr_t global_status = 0;
+        static inline uintptr_t globals_status = 0;
     public:
         static inline std::vector<SingleSystem> created_systems;
         static void init(void);
@@ -26,6 +26,8 @@ class System {
         static void setname(std::string value);
 
         static int create(const std::string& str, int x, int y, int z, int faction, int risk, int textureid);
+        static bool isvisible(int systemid);
+        static void setvisible(int systemid, bool visible);
 };
 
 #endif

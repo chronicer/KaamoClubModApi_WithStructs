@@ -64,6 +64,12 @@ void LuaManager::bind_api()
         "mapcoordinate_z", sol::property(&System::getmapcoordinatez, &System::setmapcoordinatez),
         "Create", [](System& self, const std::string& str, int x, int y, int z, int faction, int risk, int textureid) {
             return System::create(str, x, y, z, faction, risk, textureid);
+        },
+        "IsVisible", [](System& self, int systemid) {
+            return System::isvisible(systemid);
+        },
+        "SetVisible", [](System& self, int systemid, bool visible) {
+            return System::setvisible(systemid, visible);
         }
     );
 
