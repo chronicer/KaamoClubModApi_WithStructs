@@ -25,10 +25,8 @@ class Player {
         static void setvisitedstations(int value);
         static int getjumpgateusedcount(void);
         static void setjumpgateusedcount(int value);
-        static int getcargosalvagedcount(void);
-        static void setcargosalvagedcount(int value);
-        static int getasteroidsdestroyedcount(void);
-        static void setasteroidsdestroyedcount(int value);
+        static int getcargotookcount(void);
+        static void setcargotookcount(int value);
 
         static bool hasshiparmor(void);
         static bool isdocked(void);

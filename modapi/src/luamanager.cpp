@@ -42,8 +42,7 @@ void LuaManager::bind_api()
         "level", sol::property(&Player::getlevel, &Player::setlevel),
         "visitedstations", sol::property(&Player::getvisitedstations, &Player::setvisitedstations),
         "jumpgateusedcount", sol::property(&Player::getjumpgateusedcount, &Player::setjumpgateusedcount),
-        "cargosalvagedcount", sol::property(&Player::getcargosalvagedcount, &Player::setcargosalvagedcount),
-        "asteroidsdestroyedcount", sol::property(&Player::getasteroidsdestroyedcount, &Player::setasteroidsdestroyedcount),
+        "cargotookcount", sol::property(&Player::getcargotookcount, &Player::setcargotookcount),
         "HasShipArmor", [](Player& self) -> bool {
             return Player::hasshiparmor();
         },
@@ -62,14 +61,8 @@ void LuaManager::bind_api()
         "mapcoordinate_x", sol::property(&System::getmapcoordinatex, &System::setmapcoordinatex),
         "mapcoordinate_y", sol::property(&System::getmapcoordinatey, &System::setmapcoordinatey),
         "mapcoordinate_z", sol::property(&System::getmapcoordinatez, &System::setmapcoordinatez),
-        "Create", [](System& self, const std::string& str, int x, int y, int z, int faction, int risk, int textureid) {
-            return System::create(str, x, y, z, faction, risk, textureid);
-        },
-        "IsVisible", [](System& self, int systemid) {
-            return System::isvisible(systemid);
-        },
-        "SetVisible", [](System& self, int systemid, bool visible) {
-            return System::setvisible(systemid, visible);
+        "Create", [](System& self, const std::string& str, int x, int y, int z) {
+            System::create(str, x, y, z);
         }
     );
 
@@ -91,9 +84,6 @@ void LuaManager::bind_api()
         },
         "SetAngarShipId", [](Station& self, int id, int value) {
             Station::setangarshipid(id, value);
-        },
-        "Create", [](Station& self, const std::string& str, int techlevel, int textureid, int systemid) {
-            return Station::create(str, techlevel, textureid, systemid);
         }
     );
 

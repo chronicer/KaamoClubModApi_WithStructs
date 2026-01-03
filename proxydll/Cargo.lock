@@ -3,7 +3,7 @@
 version = 4
 
 [[package]]
-name = "proxydll-kaamoclubmodapi"
+name = "fePink"
 version = "0.1.0"
 dependencies = [
  "winapi",

@@ -5,7 +5,6 @@ class Station {
     private:
         static inline uintptr_t globals_status = 0;
     public:
-        static inline std::vector<SingleStation> created_stations;
         static void init(void);
         static int getid(void);
         static void setid(int value);
@@ -20,6 +19,5 @@ class Station {
 
         static bool isvoid(void);
         static void setangarshipid(int id, int value);
-        static int create(const std::string& str, int techlevel, int textureid, int systemid);
 };
 #endif

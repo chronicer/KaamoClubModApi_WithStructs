@@ -12,17 +12,6 @@ end
 math.randomseed(os.time())
 
 RegisterEvent("EarlyInit", function()
-	-- // Example of how to create a system with stations in
-	--local systemid = system:Create("cool system", 50, 30, 47, 3, 3, 9) -- name, x, y, z, faction, risk, textureid (star)
-	--local stationid = station:Create("test 1", 10, 9, systemid) -- name, techlevel, textureid (planet), systemid
-	--local stationid2 = station:Create("test 2", 1, 3, systemid)
-	--local stationid3 = station:Create("test 3", 2, 2, systemid)
-	--local stationid4 = station:Create("test 4", 3, 1, systemid)
-	--print("Made station id : " .. stationid)
-	--print("Made station id : " .. stationid2)
-	--print("Made station id : " .. stationid3)
-	--print("Made station id : " .. stationid4)
-	--print("My custom system id : " .. systemid)
 	--for i = 0, 23 do
 	--	system:Create(randomstring(10), i+50, 30, 47)
 	--end
@@ -32,6 +21,5 @@ RegisterEvent("IsInGame", function()
 	if printonetime then return end
 	print("hi second script")
 	printonetime = true
-	--system:Create("icantcreateezfzehufhzefhuez", 328,32,28,3, 3, 11)
-	--station:Create("cant create outside of earlyinit", 10, 4, 11111111)
+	--system:Create("icantcreateezfzehufhzefhuez", 328,32,28)
 end)

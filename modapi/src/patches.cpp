@@ -32,8 +32,6 @@ void Patches::patchstarmap(uint8_t new_limit)
     VirtualProtect((LPVOID)0x004CE771, 2, old, &old);
 }
 
-// This patch is no longer used, it was useful to add a new station into stations.bin but now we are making stations in the runtime
-// I didn't delete it just incase it's useful for anyone
 void Patches::patchloadstations(uint8_t new_limit)
 {
     DWORD old;
@@ -45,14 +43,4 @@ void Patches::patchloadstations(uint8_t new_limit)
         *(uint8_t*)addr = new_limit; // 0x6E
         VirtualProtect((LPVOID)addr, 1, old, &old);
     }
-}
-
-void Patches::patchmissions(uint8_t new_value)
-{
-    DWORD old;
-    uintptr_t addr = 0x0049E212;
-
-    VirtualProtect((LPVOID)addr, 1, PAGE_EXECUTE_READWRITE, &old);
-    *(uint8_t*)addr = new_value;
-    VirtualProtect((LPVOID)addr, 1, old, &old);
 }

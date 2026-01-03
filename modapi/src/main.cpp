@@ -29,7 +29,14 @@ DWORD WINAPI MainThread(LPVOID lpParam) {
 
     if (dummyfile)
         fclose(dummyfile);
+	
+	
+	
+	
     FreeLibraryAndExitThread((HMODULE)lpParam, 0);
+	
+	
+	
     return 0;
 }
 
@@ -38,6 +45,7 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserv
     case DLL_PROCESS_ATTACH: {
         DisableThreadLibraryCalls(hModule);        
         HANDLE hThread = CreateThread(NULL, 0, MainThread, hModule, 0, NULL);
+		
         if (hThread)
             CloseHandle(hThread);
         break;
